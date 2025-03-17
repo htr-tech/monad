@@ -1,0 +1,16 @@
+{
+    "name": "bulksend",
+    "version": "1.0.0",
+    "description": "A smart contract example to BulkSend Native token on MonTestnet",
+    "scripts": {
+        "compile": "npx hardhat compile",
+        "deploy": "npx hardhat run scripts/deploy.js --network monadtestnet",
+        "distribute": "npx hardhat run scripts/distribute.js"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "dotenv": "^16.4.7",
+        "hardhat": "^2.22.19",
+        "inquirer": "^12.5.0"
+    }
+}
