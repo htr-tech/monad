@@ -1,0 +1,12 @@
+{
+    "type": "module",
+    "scripts": {
+        "start": "node pinfolder.js"
+    },
+    "dependencies": {
+        "base-path-converter": "^1.0.2",
+        "form-data": "^4.0.2",
+        "got": "^14.4.7",
+        "recursive-fs": "^2.1.0"
+    }
+}
