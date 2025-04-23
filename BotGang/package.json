@@ -1,0 +1,20 @@
+{
+    "name": "botgang",
+    "version": "1.0.0",
+    "description": "BotGang Cult Membership Pass NFT",
+    "license": "ISC",
+    "author": "htr-tech",
+    "scripts": {
+      "compile": "npx hardhat compile",
+      "deploy": "npx hardhat run scripts/mint.js --network monadtestnet",
+      "single": "npx hardhat run scripts/new.js",
+      "drop": "npx hardhat run scripts/drop.js"
+    },
+    "devDependencies": {
+      "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+      "@openzeppelin/contracts": "^4.9.5",
+      "dotenv": "^16.5.0",
+      "hardhat": "^2.23.0",
+      "inquirer": "^12.5.2"
+    }
+}
