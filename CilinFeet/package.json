@@ -1,0 +1,20 @@
+{
+    "name": "cilinxbotgang",
+    "version": "1.0.0",
+    "description": "A Meme NFT collection of Monad Testnet",
+    "author": "htr-tech",
+    "scripts": {
+        "compile": "npx hardhat compile",
+        "clean": "npx hardhat clean",
+        "deploy": "npx hardhat run scripts/deploy.js --network monadtestnet",
+        "single": "npx hardhat run scripts/mint.js",
+        "drop": "npx hardhat run scripts/drop.js"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "@openzeppelin/contracts": "^5.1.0",
+        "dotenv": "^16.5.0",
+        "hardhat": "^2.23.0",
+        "inquirer": "^12.5.2"
+    }
+}
