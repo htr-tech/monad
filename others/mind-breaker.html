@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <!-- 
-	CHAOTIC WORDS SOLVER (Discord Web3 Game) 
+    CHAOTIC WORDS SOLVER
     
     Reason of making: Watching people using their last braincells while you 
     casually ctrl+v a perfect answer is the ultimate power move.
@@ -208,7 +208,7 @@
   <body>
     <div style="width: 100%;">
       <div class="header-container">
-        <h1 class="rainbow-text">Đồng tính Debeloper Tool</h1>
+        <h1 class="rainbow-text">Chaotic Solver v2</h1>
       </div>
       <div class="checkbox-container">
         <button class="remove-pair-btn" onclick="resetValues();">CLEAR</button>
@@ -259,7 +259,7 @@
       const remPair = document.getElementById("main-remove-pair-btn");
       const cmdInput = document.getElementById("command-input");
 
-      // Initialize with 3 pairs
+      // Initialize with 3 replace boxes (default)
       function initializePairs() {
         tbaPair.innerHTML = "";
         for (let i = 0; i < 3; i++) {
@@ -267,34 +267,7 @@
         }
       }
 
-      function print(line, className = "") {
-        const div = document.createElement("div");
-        div.className = className;
-        div.textContent = line;
-        output.appendChild(div);
-        output.scrollTop = output.scrollHeight;
-      }
-
-      function resetValues() {
-        // Clear all input values
-        const inputs = document.querySelectorAll(".tba-input");
-        inputs.forEach((input) => {
-          input.value = "";
-        });
-
-        // Uncheck checkboxes
-        checkboxes.forEach((checkbox) => {
-          checkbox.checked = false;
-        });
-      }
-
-      function copy(text) {
-        navigator.clipboard
-          .writeText(text)
-          .then(() => console.log(`Copied: ${text}`))
-          .catch((err) => console.error("Copy failed", err));
-      }
-
+      // Add replace boxes
       function addNewPair() {
         const pairDiv = document.createElement("div");
         pairDiv.className = "tba-pair";
@@ -305,6 +278,7 @@
         tbaPair.appendChild(pairDiv);
       }
 
+      // Remove replace boxes
       function removePair() {
         const pairs = document.querySelectorAll(".tba-pair");
         if (pairs.length > 3) {
@@ -312,50 +286,37 @@
         }
       }
 
-      // Main Replace Function
-      function replaceMain(text, pairs) {
-        let word = text;
-        const cngIndices = new Set();
-
-        for (const [from, to] of pairs) {
-          // Case for consonant
-          if (from.toUpperCase() === "CONSO") {
-            const vowels = ["a", "e", "i", "o", "u", "A", "E", "I", "O", "U"];
-            for (let i = 0; i < word.length; i++) {
-              if (
-                !cngIndices.has(i) &&
-                !vowels.includes(word[i]) &&
-                word[i].match(/[a-zA-Z]/)
-              ) {
-                word = word.substring(0, i) + to + word.substring(i + 1);
-                cngIndices.add(i);
-              }
-            }
-            continue;
-          }
-
-          // Split from comma if multiple
-          const findLetters = from
-            .split(",")
-            .map((f) => f.trim())
-            .filter((f) => f.length > 0);
-
-          for (const find of findLetters) {
-            for (let i = 0; i < word.length; i++) {
-              if (!cngIndices.has(i)) {
-                // Check if i matches any
-                if (find.includes(word[i])) {
-                  word = word.substring(0, i) + to + word.substring(i + 1);
-                  cngIndices.add(i);
-                }
-              }
-            }
-          }
-        }
-
-        return word;
+      // Reset all input values and terminal output
+      function resetValues() {
+        output.innerHTML = "";
+        const inputs = document.querySelectorAll(".tba-input");
+        inputs.forEach((input) => {
+          input.value = "";
+        });
+        // Uncheck checkboxes
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = false;
+        });
       }
 
+      // Print to terminal
+      function print(line, className = "") {
+        const div = document.createElement("div");
+        div.className = className;
+        div.textContent = line;
+        output.appendChild(div);
+        output.scrollTop = output.scrollHeight;
+      }
+
+      // Copy to clipboard (result)
+      function copy(text) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => console.log(`Copied: ${text}`))
+          .catch((err) => console.error("Copy failed", err));
+      }
+
+      // Find empty replace box
       function findEmptyPair() {
         const pairs = document.querySelectorAll(".tba-pair");
         for (let i = 0; i < pairs.length; i++) {
@@ -372,6 +333,7 @@
         return null;
       }
 
+      // Set replace input (vowel)
       function setVowel() {
         const emptyPair = findEmptyPair();
         if (emptyPair) {
@@ -382,16 +344,18 @@
         }
       }
 
+      // Set replace input (consonant)
       function setConsonant() {
         const emptyPair = findEmptyPair();
         if (emptyPair) {
           const findInput = emptyPair.querySelector("input:nth-child(1)");
           const replaceInput = emptyPair.querySelector("input:nth-child(2)");
-          findInput.value = "CONSO";
+          findInput.value = "CONSO"; // CONSO will call all the consonants
           replaceInput.focus();
         }
       }
 
+      // Clear replace input (vowel/consonant)
       function clearVowelConsonant() {
         const pairs = document.querySelectorAll(".tba-pair");
         pairs.forEach((pair) => {
@@ -403,10 +367,123 @@
         });
       }
 
+      // <!-- Main Replace Function -->
+
+      function replaceMain(text, pairs) {
+        let word = text.toLowerCase();
+        const replacements = [];
+
+        // Step 1: Find all occurrences of the pairs
+        // Iterate through each pair of find and replace
+        // and find all occurrences in the word
+        for (const [from, to] of pairs) {
+          let occurrence = null;
+          let actualFrom = from;
+
+          // Handle numbered occurrences (3-a)
+          const numPrefixMatch = from.match(/^(\d+)-(.+)/);
+          if (numPrefixMatch) {
+            occurrence = parseInt(numPrefixMatch[1]);
+            actualFrom = numPrefixMatch[2];
+          }
+
+          // Handler for consonants
+          if (actualFrom.toUpperCase() === "CONSO") {
+            const vowels = ["a", "e", "i", "o", "u"];
+            for (let i = 0; i < word.length; i++) {
+              if (!vowels.includes(word[i]) && word[i].match(/[a-z]/)) {
+                if (!replacements.find((r) => r.index === i)) {
+                  replacements.push({ index: i, length: 1, value: to });
+                }
+              }
+            }
+            continue;
+          }
+
+          const targets = actualFrom.includes(",")
+            ? actualFrom
+                .split(",")
+                .map((f) => f.trim())
+                .filter((f) => f)
+            : [actualFrom];
+
+          for (const target of targets) {
+            if (target.length === 1) {
+              // Single character
+              let count = 0;
+              for (let i = 0; i < word.length; i++) {
+                if (
+                  word[i] === target &&
+                  !replacements.find((r) => r.index === i)
+                ) {
+                  count++;
+                  if (!occurrence || count === occurrence) {
+                    replacements.push({ index: i, length: 1, value: to });
+                    if (occurrence) break;
+                  }
+                }
+              }
+            } else {
+              // Whole word
+              let pos = 0;
+              let count = 0;
+              while ((pos = word.indexOf(target, pos)) !== -1) {
+                if (
+                  !replacements.find(
+                    (r) =>
+                      r.index < pos + target.length && r.index + r.length > pos
+                  )
+                ) {
+                  count++;
+                  if (!occurrence || count === occurrence) {
+                    replacements.push({
+                      index: pos,
+                      length: target.length,
+                      value: to,
+                    });
+                    if (occurrence) break;
+                  }
+                  pos += target.length;
+                } else {
+                  pos++;
+                }
+              }
+            }
+          }
+        }
+
+        // Step 2: Sort replacements by index (left to right)
+        // This is important to avoid overlapping replacements
+        // and to ensure the correct order of replacements
+        replacements.sort((a, b) => a.index - b.index);
+
+        let result = "";
+        let cursor = 0;
+
+        // Step 3: Replace the found occurrences
+        // Iterate through the replacements and build the result string
+        for (const { index, length, value } of replacements) {
+          result += word.slice(cursor, index) + value;
+          cursor = index + length;
+        }
+
+        result += word.slice(cursor);
+        return result;
+      }
+
+      // <!-- // Main Replace Function -->
+
+      // Process command from terminal
+      // It takes the command input, processes it, and prints the result
+      // It also handles special commands like "clear" or "cls" and "help"
+      // It also handles the [1] suffix for flipping text
       function processCommand(command) {
         print(`> ${command}`, "command");
 
-        if (command.toLowerCase() === "clear") {
+        if (
+          command.toLowerCase() === "clear" ||
+          command.toLowerCase() === "cls"
+        ) {
           output.innerHTML = "";
           resetValues();
           return;
@@ -414,15 +491,25 @@
 
         if (command.toLowerCase() === "help" || command === "?") {
           print("Enter text to process with current replacement rules", "help");
-          print("Example: cat", "help");
-          print(
-            '\nCommands: "clear" to clear terminal, "help" for this menu',
-            "help"
-          );
+          print("\nCommands:", "help");
+          print('"help" or "?" to get this menu', "help");
+          print('"clear" or "cls" to clear terminal', "help");
+          print('"text[1]" to flip word. Result: "txet"', "help");
           return;
         }
 
         try {
+          const tFlip = command.endsWith("[1]");
+          const cleanCommand = tFlip ? command.slice(0, -3) : command;
+
+          // Flip the text if [1] was at the end
+          if (tFlip) {
+            replacedCommand = cleanCommand.split("").reverse().join("");
+            print(`Result: ${replacedCommand}`, "output");
+            copy(replacedCommand);
+            return;
+          }
+
           const pairs = [];
           const findInputs = document.querySelectorAll(
             ".tba-pair input:nth-child(1)"
@@ -440,17 +527,18 @@
           }
 
           if (pairs.length > 0) {
-            const replacedCommand = replaceMain(command, pairs);
+            let replacedCommand = replaceMain(cleanCommand, pairs);
             print(`Result: ${replacedCommand}`, "output");
             copy(replacedCommand);
           } else {
-            print("Error: No replacement pairs entered", "error");
+            print("Error: No replacement pairs", "error");
           }
         } catch (e) {
           print(`Error: ${e.message}`, "error");
         }
       }
 
+      // Initialize pairs on load
       initializePairs();
 
       // Update checkbox event listener
@@ -471,19 +559,19 @@
       addPair.addEventListener("click", addNewPair);
       remPair.addEventListener("click", removePair);
 
-      // Handle input
-      cmdInput.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          processCommand(cmdInput.value);
-          cmdInput.value = "";
-        }
-      });
-
       // Keep focus on terminal
       const terminal = document.getElementById("terminal");
       terminal.addEventListener("click", (e) => {
         if (e.target === terminal) {
           cmdInput.focus();
+        }
+      });
+
+      // Handle input on terminal
+      cmdInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          processCommand(cmdInput.value);
+          cmdInput.value = "";
         }
       });
     </script>
